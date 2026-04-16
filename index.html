@@ -318,12 +318,11 @@ Mulakan penilaian pertama anda sekarang.</p>
     </div>
 
    <script>
-        // MODIFIED: Removed hardcoded access codes and changed 'const' to 'let' to allow dynamic updates
+        // MODIFIED: Inisialisasi ACCESS_CODES
         let ACCESS_CODES = { main: '', parenting: '', legacy: '', kids: '', admin: '' };
 
-        // ADDED: Firebase Initialization and Real-Time Fetching
+        // ADDED: Konfigurasi Firebase
         const firebaseConfig = {
-            // Replace these with your actual Firebase project configuration credentials
             apiKey: "AIzaSyA7SW4U--evGtfRyPz5Feh3mEN8MF92gTg",
             authDomain: "familipintar.firebaseapp.com",
             databaseURL: "https://familipintar-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -333,23 +332,27 @@ Mulakan penilaian pertama anda sekarang.</p>
             appId: "1:277029764059:web:0a21bb2e01d868b1ed05fe"
         };
         
+        console.log("Memulakan Firebase...");
         firebase.initializeApp(firebaseConfig);
 
-        // Fetch real-time data from "access_code"
+        // MODIFIED: Fetch data real-time dengan Log Debugging
         firebase.database().ref('access_code').on('value', (snapshot) => {
             const data = snapshot.val();
+            console.log("Data diterima dari Firebase:", data); // Lihat ini di Console (F12)
+
             if (data) {
                 if (typeof data === 'string') {
-                    // Handled in case the DB just has a single string
                     ACCESS_CODES.main = data;
                 } else if (typeof data === 'object') {
-                    // Handled in case the DB mirrors the object structure 
-                    // (e.g. { main: "CODE1", admin: "CODE2" })
                     ACCESS_CODES = { ...ACCESS_CODES, ...data };
                 }
+                console.log("Kod Akses Aktif:", ACCESS_CODES);
+            } else {
+                console.warn("Amaran: Path 'access_code' kosong atau tidak dijumpai di database.");
             }
+        }, (error) => {
+            console.error("Ralat Firebase:", error.message);
         });
-        // END OF ADDED
 
         const ONPAY_LINKS = { parenting: 'https://toyyibpay.com/Famili-Pintar-2', legacy: 'https://toyyibpay.com/Famili-Pintar-3', kids: 'https://toyyibpay.com/Famili-Pintar-4' };
         let activeUnlockTarget = '';
@@ -357,18 +360,28 @@ Mulakan penilaian pertama anda sekarang.</p>
 
         function checkLogin() {
             const input = document.getElementById('passwordInput').value.trim().toUpperCase();
-            if (input === ACCESS_CODES.main || input === ACCESS_CODES.admin) {
+            console.log("Percubaan Login dengan kod:", input);
+            console.log("Membandingkan dengan:", ACCESS_CODES);
+
+            // Periksa kod utama atau kod admin
+            if ((ACCESS_CODES.main && input === ACCESS_CODES.main.toUpperCase()) || 
+                (ACCESS_CODES.admin && input === ACCESS_CODES.admin.toUpperCase())) {
+                
+                console.log("Login Berjaya!");
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('access_finance', 'true');
-                if (input === ACCESS_CODES.admin) {
+                
+                if (ACCESS_CODES.admin && input === ACCESS_CODES.admin.toUpperCase()) {
                     ['finance', 'parenting', 'legacy', 'kids'].forEach(l => sessionStorage.setItem(`access_${l}`, 'true'));
                 }
                 showApp();
             } else {
+                console.error("Kod salah atau belum dimuatkan sepenuhnya.");
                 document.getElementById('loginError').classList.remove('hidden');
             }
         }
 
+        // Selebihnya kod asal dikekalkan tanpa perubahan...
         function showApp() {
             document.getElementById('loginOverlay').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('opacity-0');
@@ -424,7 +437,8 @@ Mulakan penilaian pertama anda sekarang.</p>
         function closeUnlockModal() { document.getElementById('unlockModal').classList.add('hidden'); }
         function verifyUnlockCode() {
             const code = document.getElementById('unlockCodeInput').value.trim().toUpperCase();
-            if (code === ACCESS_CODES[activeUnlockTarget] || code === ACCESS_CODES.admin) {
+            if ((ACCESS_CODES[activeUnlockTarget] && code === ACCESS_CODES[activeUnlockTarget].toUpperCase()) || 
+                (ACCESS_CODES.admin && code === ACCESS_CODES.admin.toUpperCase())) {
                 sessionStorage.setItem(`access_${activeUnlockTarget}`, 'true');
                 closeUnlockModal();
                 applyAccessControl();
