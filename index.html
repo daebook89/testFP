@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S3RP7E4460"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-S3RP7E4460');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Famili Pintar</title>
@@ -8,10 +15,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- ADDED: Firebase SDK via CDN -->
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-database-compat.js"></script>
-    <!-- END OF ADDED -->
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
@@ -329,16 +334,17 @@ Mulakan penilaian pertama anda sekarang.</p>
             projectId: "familipintar",
             storageBucket: "familipintar.firebasestorage.app",
             messagingSenderId: "277029764059",
-            appId: "1:277029764059:web:0a21bb2e01d868b1ed05fe"
+            appId: "1:277029764059:web:0a21bb2e01d868b1ed05fe",
+            measurementId: "G-S3RP7E4460"
         };
         
-        console.log("Memulakan Firebase...");
+        //console.log("Memulakan Firebase...");
         firebase.initializeApp(firebaseConfig);
 
         // MODIFIED: Fetch data real-time dengan Log Debugging
         firebase.database().ref('access_code').on('value', (snapshot) => {
             const data = snapshot.val();
-            console.log("Data diterima dari Firebase:", data); // Lihat ini di Console (F12)
+            //console.log("Data diterima dari Firebase:", data); // Lihat ini di Console (F12)
 
             if (data) {
                 if (typeof data === 'string') {
@@ -346,7 +352,7 @@ Mulakan penilaian pertama anda sekarang.</p>
                 } else if (typeof data === 'object') {
                     ACCESS_CODES = { ...ACCESS_CODES, ...data };
                 }
-                console.log("Kod Akses Aktif:", ACCESS_CODES);
+                //console.log("Kod Akses Aktif:", ACCESS_CODES);
             } else {
                 console.warn("Amaran: Path 'access_code' kosong atau tidak dijumpai di database.");
             }
@@ -360,7 +366,7 @@ Mulakan penilaian pertama anda sekarang.</p>
 
         function checkLogin() {
             const input = document.getElementById('passwordInput').value.trim().toUpperCase();
-            console.log("Percubaan Login dengan kod:", input);
+            //console.log("Percubaan Login dengan kod:", input);
             console.log("Membandingkan dengan:", ACCESS_CODES);
 
             // Periksa kod utama atau kod admin
